@@ -17,6 +17,8 @@ from typing import Dict, List, Tuple
 from collector.config import CONFIG_PATH
 from collector.assets import Asset
 from collector.assets import utils
+from collector.queue.subscriber import Subscriber
+from collector.influx.influx_controller import InfluxController
 
 with open(CONFIG_PATH, 'r') as file:
     CONFIG = yaml.safe_load(file)
@@ -33,6 +35,11 @@ def main():
     thread.start()
 
     utils.setup_logging(CONFIG['logging']['level'])
+    
+    signal.signal(signal.SIGINT, __signal_handler)
+
+    asset_list = __init_thread()
+    logging.info('Collector started')
 
 
 def __load_env_file(env_file_path=".env"):
@@ -106,4 +113,38 @@ def __signal_handler(sig, frame):
     sys.exit(0)
 
 
+def __init_thread() -> List[Tuple[Asset, Thread]]:
+    """
+    Initialize the threads for the assets. For each asset a thread is created
+    """
+    asset_list: List[Tuple[Asset, Thread]] = []
 
+    try:
+        influx_controller = InfluxController()
+    except Exception as e:
+        print(f'Error initializing InfluxDB controller: {e}')
+        logging.error(f'Error initializing InfluxDB controller: {e}')
+        logging.error(traceback.format_exc())
+        sys.exit(1)
+
+    try:
+        influx_controller.create_bucket(CONFIG['influx']['bucket'])
+    except Exception as e:
+        print(f'Error creating InfluxDB bucket: {e}')
+        logging.error(f'Error creating InfluxDB bucket: {e}')
+        logging.error(traceback.format_exc())
+        sys.exit(1)
+
+    logging.info(f'InfluxDB bucket {CONFIG["influx"]["bucket"]} created')
+    logging.info('Initialising threads')
+
+
+if __name__ == '__main__':
+    if len(argv) > 1:
+        if argv[1] == "--demo":
+            pass # to add a demo portion
+        else:
+            print("Invalid argument")
+            sys.exit(1)
+    else:
+        main()
