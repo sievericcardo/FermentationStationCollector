@@ -14,9 +14,8 @@ class HumidityAsset(Asset):
 
     Attributes:
     """
-    sensor_id: str
 
-    def to_point(self) -> Point:
+    def to_point(self, sensor_id: str, value: float) -> Point:
         """
         Convert the asset to an InfluxDB point.
 
@@ -24,6 +23,6 @@ class HumidityAsset(Asset):
             The InfluxDB point.
         """
         point = Point(Measurement.HUMIDITY.get_measurement_name())
-        point.tag("th_sensor", self.sensor_id)
-        point.field("value", self.value)
+        point.tag("th_sensor", sensor_id)
+        point.field("value", value)
         return point
