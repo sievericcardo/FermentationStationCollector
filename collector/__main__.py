@@ -138,6 +138,12 @@ def __init_thread() -> List[Tuple[Asset, Thread]]:
     logging.info(f'InfluxDB bucket {CONFIG["influx"]["bucket"]} created')
     logging.info('Initialising threads')
 
+    for asset in CONFIG['assets']:
+        a = Asset(asset['port'], asset['baudrate'], asset['timeout'])
+        t = Thread(target=a.start)
+        asset_list.append((a, t))
+        t.start()
+
 
 if __name__ == '__main__':
     if len(argv) > 1:
