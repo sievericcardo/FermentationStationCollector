@@ -2,6 +2,7 @@ import serial
 import time
 import logging
 from typing import Tuple
+import threading
 
 class SerialReader:
     """
@@ -20,6 +21,7 @@ class SerialReader:
         self.port = port
         self.baudrate = baudrate
         self.timeout = timeout
+        self.lock = threading.Lock()
 
     def read(self) -> Tuple[str, str]:
         """
@@ -28,10 +30,11 @@ class SerialReader:
         Returns:
             The serial data.
         """
-        with serial.Serial(self.port, self.baudrate, timeout=self.timeout) as ser:
-            ser.flushInput()
-            ser.flushOutput()
-            # time.sleep(1)
-            data = ser.readline().decode('utf-8').strip()
-            logging.debug(f'Read serial data: {data}')
-            return data
+        with self.lock:
+            with serial.Serial(self.port, self.baudrate, timeout=self.timeout) as ser:
+                ser.flushInput()
+                ser.flushOutput()
+                # time.sleep(1)
+                data = ser.readline().decode('utf-8').strip()
+                logging.debug(f'Read serial data: {data}')
+                return data
