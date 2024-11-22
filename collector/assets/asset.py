@@ -17,7 +17,7 @@ class Asset(ABC):
     """
     def __init__(self, port, baudrate, timeout) -> None:
         super().__init__()
-        self.serial_reader = SerialReader(port, baudrate, timeout)
+        self.serial_reader = SerialReader(int(port), baudrate, timeout)
 
     stop_flag: threading.Event = threading.Event()
     influx_controller: InfluxController = InfluxController()
