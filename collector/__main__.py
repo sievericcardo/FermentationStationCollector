@@ -15,14 +15,19 @@ from time import sleep
 from typing import Dict, List, Tuple
 
 from collector.config import CONFIG_PATH
+from collector.config import CONFIG_YML
 from collector.assets import Asset
 from collector.assets import utils
 from collector.queue.subscriber import Subscriber
 from collector.influx.influx_controller import InfluxController
 
-with open(CONFIG_PATH, 'r') as file:
+from configparser import ConfigParser
+
+with open(CONFIG_YML, 'r') as file:
     CONFIG = yaml.safe_load(file)
 
+conf: ConfigParser = ConfigParser()
+conf.read(CONFIG_PATH)
 
 def main():
     """
@@ -87,7 +92,7 @@ def __wait_message():
 
     try:
         conn = stomp.Connection([url, port])
-        conn.set_listener('', Subscriber(conn, conf, CONFIG_PATH))
+        conn.set_listener('', Subscriber(conn, conf, CONFIG_YML))
         conn.start()
         conn.connect(user, password, wait=True)
 
