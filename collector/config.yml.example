@@ -1,11 +1,11 @@
 influx:
-  bucket: FermentationStation
+  - bucket: FermentationStation
 
 asset:
-  port:
-  baudrate:
-  timeout:
+  - port:
+  - baudrate:
+  - timeout:
 
 logging:
-  level: DEBUG
+  - level: DEBUG
   
