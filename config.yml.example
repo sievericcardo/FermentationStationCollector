@@ -1,0 +1,11 @@
+influx:
+  bucket: FermentationStation
+
+asset:
+  port:
+  baudrate:
+  timeout:
+
+logging:
+  level: DEBUG
+  
