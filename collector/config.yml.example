@@ -1,5 +1,5 @@
 influx:
-  - bucket: FermentationStation
+  bucket: FermentationStation
 
 assets:
   - port:
@@ -7,5 +7,4 @@ assets:
     timeout:
 
 logging:
-  - level: DEBUG
-  
+  level: DEBUG
