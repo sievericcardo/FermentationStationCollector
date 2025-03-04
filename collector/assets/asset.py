@@ -51,25 +51,29 @@ class Asset(ABC):
             data: The data from the serial port.
         """
         values = data.split(',')
+        bucket = self.influx_controller.get_bucket('FermentationStation')
 
         if len(values) <= 2:
             logging.error(f'Invalid data: {data}')
             return
         
-        if values[0] == 'TH':
+        if values[0] == 'T':
             id = values[1]
             temperature = float(values[2])
-            humidity = float(values[3])
 
             t = Point(Measurement.TEMPERATURE.get_measurement_name()) \
-                .tag('th_sensor', id) \
+                .tag('t_sensor', id) \
                 .field('value', temperature)
-            self.influx_controller.write(t)
+            self.influx_controller.write_point(t, bucket)
+
+        elif values[0] == 'H':
+            id = values[1]
+            humidity = float(values[2])
 
             h = Point(Measurement.HUMIDITY.get_measurement_name()) \
-                .tag('th_sensor', id) \
+                .tag('h_sensor', id) \
                 .field('value', humidity)
-            self.influx_controller.write(h)
+            self.influx_controller.write_point(h, bucket)
         elif values[0] == 'PH':
             id = values[1]
             ph = float(values[2])
@@ -77,7 +81,7 @@ class Asset(ABC):
             p = Point(Measurement.PH.get_measurement_name()) \
                 .tag('ph_sensor', id) \
                 .field('value', ph)
-            self.influx_controller.write(p)
+            self.influx_controller.write_point(p, bucket)
 
     def __collect(self) -> None:
         """

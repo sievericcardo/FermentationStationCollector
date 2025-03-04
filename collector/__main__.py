@@ -15,14 +15,20 @@ from time import sleep
 from typing import Dict, List, Tuple
 
 from collector.config import CONFIG_PATH
+from collector.config import CONFIG_YML
 from collector.assets import Asset
+from collector.assets import SensorAsset
 from collector.assets import utils
 from collector.queue.subscriber import Subscriber
 from collector.influx.influx_controller import InfluxController
 
-with open(CONFIG_PATH, 'r') as file:
+from configparser import ConfigParser
+
+with open(CONFIG_YML, 'r') as file:
     CONFIG = yaml.safe_load(file)
 
+conf: ConfigParser = ConfigParser()
+conf.read(CONFIG_PATH)
 
 def main():
     """
@@ -31,7 +37,7 @@ def main():
     Returns:
         None
     """
-    thread = Thread(target=__wait_message)
+    thread = Thread(target=_wait_message)
     thread.start()
 
     utils.setup_logging(CONFIG['logging']['level'])
@@ -65,41 +71,44 @@ def __load_env_file(env_file_path=".env"):
         logging.warning(f"Environment file not found: {env_file_path}")
 
 
-def __wait_message():
-    """
-    Wait for a message from the message broker.
+def _wait_message():
+    print("Waiting for message")
 
-    Returns:
-        None
-    """
-    __load_env_file()
-    url = os.getenv("BROKER_URL")
-    port = int(os.getenv("BROKER_PORT"))
-    user = os.getenv("BROKER_USERNAME")
-    password = os.getenv("BROKER_PASSWORD")
+# def __wait_message():
+    # """
+    # Wait for a message from the message broker.
 
-    hostname = socket.gethostname()
-    r = re.compile("([a-zA-Z]+)([0-9]+)")
-    m = r.match(hostname)
+    # Returns:
+    #     None
+    # """
+    # __load_env_file()
+    # url = os.getenv("BROKER_URL")
+    # port = int(os.getenv("BROKER_PORT"))
+    # user = os.getenv("BROKER_USERNAME")
+    # password = os.getenv("BROKER_PASSWORD")
 
-    # Match the tuple to listen
-    queue_destination = m.group(1) + "." + m.group(2) + ".config"
+    # hostname = socket.gethostname()
+    # r = re.compile("([a-zA-Z]+)([0-9]+)")
+    # m = r.match(hostname)
 
-    try:
-        conn = stomp.Connection([url, port])
-        conn.set_listener('', Subscriber(conn, conf, CONFIG_PATH))
-        conn.start()
-        conn.connect(user, password, wait=True)
+    # # Match the tuple to listen
+    # queue_destination = m.group(1) + "." + m.group(2) + ".config"
 
-        conn.subscribe(destination=queue_destination, id=1, ack='auto')
+    # try:
+    #     conn = stomp.Connection([url, port])
+    #     conn.set_listener('', Subscriber(conn, conf, CONFIG_YML))
+    #     conn.start()
+    #     conn.connect(user, password, wait=True)
 
-        while True:
-            sleep(1)
+    #     conn.subscribe(destination=queue_destination, id=1, ack='auto')
 
-    except Exception as e:
-        logging.error(f'Error waiting for message: {e}')
-        logging.error(traceback.format_exc())
-        sys.exit(1)
+    #     while True:
+    #         sleep(1)
+
+    # except Exception as e:
+    #     logging.error(f'Error waiting for message: {e}')
+    #     logging.error(traceback.format_exc())
+    #     sys.exit(1)
 
 def __signal_handler(sig, frame):
     """
@@ -139,7 +148,7 @@ def __init_thread() -> List[Tuple[Asset, Thread]]:
     logging.info('Initialising threads')
 
     for asset in CONFIG['assets']:
-        a = Asset(asset['port'], asset['baudrate'], asset['timeout'])
+        a = SensorAsset(asset['port'], int(asset['baudrate']), int(asset['timeout']))
         t = Thread(target=a.start)
         asset_list.append((a, t))
         t.start()
