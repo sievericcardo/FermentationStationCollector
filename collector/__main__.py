@@ -17,6 +17,7 @@ from typing import Dict, List, Tuple
 from collector.config import CONFIG_PATH
 from collector.config import CONFIG_YML
 from collector.assets import Asset
+from collector.assets import SensorAsset
 from collector.assets import utils
 from collector.queue.subscriber import Subscriber
 from collector.influx.influx_controller import InfluxController
@@ -147,7 +148,7 @@ def __init_thread() -> List[Tuple[Asset, Thread]]:
     logging.info('Initialising threads')
 
     for asset in CONFIG['assets']:
-        a = Asset(int(asset['port']), int(asset['baudrate']), int(asset['timeout']))
+        a = SensorAsset(asset['port'], int(asset['baudrate']), int(asset['timeout']))
         t = Thread(target=a.start)
         asset_list.append((a, t))
         t.start()
