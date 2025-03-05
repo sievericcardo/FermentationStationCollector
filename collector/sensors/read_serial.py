@@ -22,7 +22,7 @@ class SerialReader:
         self.baudrate = baudrate
         self.timeout = timeout
         self.lock = threading.Lock()
-        ser = serial.Serial(self.port, self.baudrate, timeout=self.timeout) 
+        self.ser = serial.Serial(self.port, self.baudrate, timeout=self.timeout) 
 
     def read(self) -> Tuple[str, str]:
         """
@@ -32,9 +32,9 @@ class SerialReader:
             The serial data.
         """
         with self.lock:
-            ser.flushInput()
-            ser.flushOutput()
+            self.ser.flushInput()
+            self.ser.flushOutput()
             # time.sleep(1)
-            data = ser.readline().decode('utf-8').strip()
+            data = self.ser.readline().decode('utf-8').strip()
             logging.debug(f'Read serial data: {data}')
             return data
