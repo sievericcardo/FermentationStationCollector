@@ -3,8 +3,8 @@
 #include "MQ135.h" 
 
 // PINS
-#define MQPIN 11
-#define DHTPIN0 13
+#define MQPIN 0
+#define DHTPIN0 11
 #define DHTPIN1 14
 #define RELAYPIN0 7
 #define RELAYPIN1 3
