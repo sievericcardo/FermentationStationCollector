@@ -94,7 +94,7 @@ class Asset(ABC):
 
                 # point = self.to_point()
                 # self.influx_controller.write(point)
-                time.sleep(self.sensor_read_interval)
+                # time.sleep(self.sensor_read_interval)
             except Exception as e:
                 logging.error(f'Error collecting asset data: {e}')
                 logging.error(traceback.format_exc())
