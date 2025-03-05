@@ -1,5 +1,5 @@
 //Libraries
-#include <DHT.h>;
+#include <DHT.h>
 #include "MQ135.h" 
 
 // PINS
@@ -33,7 +33,7 @@ void setup() {
 void move_relay(int relay, int duration){
   digitalWrite(relay, LOW);
   delay(duration);
-  digitalWrite(relay1, HIGH);
+  digitalWrite(relay, HIGH);
 }
 
 // Helper function to write value triple to commandline
@@ -52,6 +52,6 @@ void loop() {
   write_line("H", DHTPIN1, dht1.readHumidity());
   write_line("T", DHTPIN1, dht1.readTemperature());
 
-  write_line("G", MQPIN, mq.getRZero())
+  write_line("G", MQPIN, mq.getRZero());
   delay(iteration_delay);
 }
