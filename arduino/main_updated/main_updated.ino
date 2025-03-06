@@ -3,11 +3,11 @@
 #include "MQ135.h" 
 
 // PINS
-#define MQPIN 0
+#define MQPIN 10
 #define DHTPIN0 13
 #define DHTPIN1 12
-#define RELAYPIN0 7
-#define RELAYPIN1 3
+#define RELAYPININ 3
+#define RELAYPINOUT 2
 
 #define DHTTYPE DHT22   // DHT 22  (AM2302)
 
@@ -22,6 +22,9 @@ void setup() {
 	dht0.begin();
   dht1.begin();
 
+  // set mode
+  pinMode(RELAYPININ, OUTPUT);
+  pinMode(RELAYPINOUT, OUTPUT);    
   // Relay is LOW activated!!!
   digitalWrite(RELAYPIN0, HIGH);
   digitalWrite(RELAYPIN1, HIGH);
@@ -29,11 +32,17 @@ void setup() {
 
 // Relay movement
 // Relay is LOW activated!!!
-// TODO think about this again...
 void move_relay(int relay, int duration){
+  // ensure both set to HIGH
+  digitalWrite(RELAYPIN0, HIGH);
+  digitalWrite(RELAYPIN1, HIGH);
+
   digitalWrite(relay, LOW);
   delay(duration);
   digitalWrite(relay, HIGH);
+
+  digitalWrite(RELAYPIN0, HIGH);
+  digitalWrite(RELAYPIN1, HIGH);
 }
 
 // Helper function to write value triple to commandline
@@ -53,5 +62,9 @@ void loop() {
   write_line("T", DHTPIN1, dht1.readTemperature());
 
   write_line("G", MQPIN, mq.getRZero());
+
+  move_relay(RELAYPINOUT, 10000);
+  delay(100);
+  move_relay(RELAYPININ, 10000);
   delay(iteration_delay);
 }
