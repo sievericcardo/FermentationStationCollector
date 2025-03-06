@@ -9,6 +9,7 @@ class Measurement(Enum):
     HUMIDITY = 'humidity'
     TEMPERATURE = 'temperature'
     PH: 'ph'
+    GAS: 'gas'
 
     def get_measurement_name(self) -> str:
         """
