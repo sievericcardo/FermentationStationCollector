@@ -74,6 +74,14 @@ class Asset(ABC):
                 .tag('h_sensor', id) \
                 .field('value', humidity)
             self.influx_controller.write_point(h, bucket)
+        elif values[0] == 'G':
+            id = values[1]
+            gas = float(values[2])
+
+            g = Point(Measurement.GAS.get_measurement_name()) \
+                .tag('g_sensor', id) \
+                .field('value', gas)
+            self.influx_controller.write_point(g, bucket)
         elif values[0] == 'PH':
             id = values[1]
             ph = float(values[2])
@@ -94,7 +102,7 @@ class Asset(ABC):
 
                 # point = self.to_point()
                 # self.influx_controller.write(point)
-                time.sleep(self.sensor_read_interval)
+                # time.sleep(self.sensor_read_interval)
             except Exception as e:
                 logging.error(f'Error collecting asset data: {e}')
                 logging.error(traceback.format_exc())
